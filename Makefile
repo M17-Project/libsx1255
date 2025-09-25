@@ -35,14 +35,14 @@ clean:
 
 # Install headers and libraries (optional)
 install: $(STATIC_LIB) $(SHARED_LIB)
-	sudo cp $(HEADERS) /usr/local/include/
-	sudo cp $(STATIC_LIB) $(SHARED_LIB) /usr/local/lib/
+	sudo cp $(HEADERS) /usr/include/
+	sudo cp $(STATIC_LIB) $(SHARED_LIB) /usr/lib/
 	sudo ldconfig
 
 # Uninstall
 uninstall:
-	sudo rm -f /usr/local/include/$(HEADERS)
-	sudo rm -f /usr/local/lib/$(STATIC_LIB) /usr/local/lib/$(SHARED_LIB)
+	sudo rm -f /usr/include/$(HEADERS)
+	sudo rm -f /usr/lib/$(STATIC_LIB) /usr/lib/$(SHARED_LIB)
 	sudo ldconfig
 
 # Example program
