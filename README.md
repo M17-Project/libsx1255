@@ -82,6 +82,6 @@ sx1255_cleanup();
 ## Installation
 
 ```bash
-make install    # Install to /usr/local
-make uninstall  # Remove from /usr/local
+make install    # Install to /usr/
+make uninstall  # Remove from /usr/
 ```
