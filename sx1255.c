@@ -12,7 +12,9 @@
 #include <gpiod.h>
 
 // Configuration constants
-#define CLK_FREQ (32.0e6f)
+#ifndef SX1255_CLK_FREQ
+#define SX1255_CLK_FREQ (32.0e6f)
+#endif
 
 // SPI configuration
 static uint8_t bits = 8;
@@ -132,7 +134,7 @@ uint8_t sx1255_read_reg(uint8_t addr)
 
 void sx1255_set_rx_freq(uint32_t freq)
 {
-    uint32_t val = lround((float)freq * 1048576.0f / CLK_FREQ);
+    uint32_t val = lround((float)freq * 1048576.0f / SX1255_CLK_FREQ);
     sx1255_write_reg(0x01, (val >> 16) & 0xFF);
     sx1255_write_reg(0x02, (val >> 8) & 0xFF);
     sx1255_write_reg(0x03, val & 0xFF);
@@ -140,7 +142,7 @@ void sx1255_set_rx_freq(uint32_t freq)
 
 void sx1255_set_tx_freq(uint32_t freq)
 {
-    uint32_t val = lround((float)freq * 1048576.0f / CLK_FREQ);
+    uint32_t val = lround((float)freq * 1048576.0f / SX1255_CLK_FREQ);
     sx1255_write_reg(0x04, (val >> 16) & 0xFF);
     sx1255_write_reg(0x05, (val >> 8) & 0xFF);
     sx1255_write_reg(0x06, val & 0xFF);
