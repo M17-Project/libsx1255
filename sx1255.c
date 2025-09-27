@@ -11,11 +11,6 @@
 #include <linux/spi/spidev.h>
 #include <gpiod.h>
 
-// Configuration constants
-#ifndef SX1255_CLK_FREQ
-#define SX1255_CLK_FREQ (32.0e6f)
-#endif
-
 // SPI configuration
 static uint8_t bits = 8;
 static uint32_t speed = 500000;
