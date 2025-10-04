@@ -505,6 +505,22 @@ void sx1255_enable_rx(bool enable)
     sx1255_write_reg(0x00, val);
 }
 
+void sx1255_enable_rf_loopback(bool enable)
+{
+    uint8_t val = sx1255_read_reg(0x10);
+    
+    if (enable)
+    {
+        val |= (uint8_t)(1 << 2);
+    }
+    else
+    {
+        val &= (uint8_t)~(1 << 2);
+    }
+    
+    sx1255_write_reg(0x10, val);
+}
+
 void sx1255_get_pll_status(bool* tx_locked, bool* rx_locked)
 {
     uint8_t val = sx1255_read_reg(0x11);
