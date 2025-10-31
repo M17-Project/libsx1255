@@ -19,6 +19,7 @@ static uint8_t mode = SPI_MODE_0;
 // Device paths and configuration
 static const char *spi_device = NULL;
 static const char *gpio_chip_path = NULL;
+static int fd = -1;
 static int rst_pin_offset = 22;
 
 // Global libgpiod handles
@@ -28,7 +29,6 @@ static struct gpiod_line_request *rst_line_request = NULL;
 // Internal SPI initialization
 static int spi_init(const char *dev)
 {
-    int fd;
     int ret;
 
     fd = open(dev, O_RDWR);
@@ -83,13 +83,11 @@ static int spi_init(const char *dev)
         return -1;
     }
 
-    close(fd);
     return 0;
 }
 
 void sx1255_write_reg(uint8_t addr, uint8_t val)
 {
-    int fd = open(spi_device, O_RDWR);
     if (fd < 0)
     {
         perror("sx1255_write_reg: open");
@@ -102,13 +100,11 @@ void sx1255_write_reg(uint8_t addr, uint8_t val)
         .len = 2,
     };
     ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    close(fd);
     usleep(10000U);
 }
 
 uint8_t sx1255_read_reg(uint8_t addr)
 {
-    int fd = open(spi_device, O_RDWR);
     if (fd < 0)
     {
         perror("sx1255_read_reg: open");
@@ -122,7 +118,6 @@ uint8_t sx1255_read_reg(uint8_t addr)
         .len = 2,
     };
     ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
-    close(fd);
     usleep(10000U);
     return rx[1];
 }
@@ -275,15 +270,17 @@ void sx1255_cleanup(void)
         gpiod_line_request_release(rst_line_request);
         rst_line_request = NULL;
     }
+
     if (chip_v2)
     {
         gpiod_chip_close(chip_v2);
         chip_v2 = NULL;
     }
+
+    close(fd);
 }
 
 // Public API implementation
-
 int sx1255_init(const char* spi_dev, const char* gpio_chip, int reset_pin)
 {
     spi_device = spi_dev;
@@ -309,7 +306,6 @@ int sx1255_init(const char* spi_dev, const char* gpio_chip, int reset_pin)
 
 int sx1255_reset(void)
 {
-    usleep(100000U);
     if (rst(1) != 0)
         return -1;
     usleep(100000U);
