@@ -485,6 +485,38 @@ void sx1255_enable_tx(bool enable)
     sx1255_write_reg(0x00, val);
 }
 
+void sx1255_enable_tx_pa(bool enable)
+{
+    uint8_t val = sx1255_read_reg(0x00);
+    
+    if (enable)
+    {
+        val |= (uint8_t)(1 << 3);
+    }
+    else
+    {
+        val &= (uint8_t)~(1 << 3);
+    }
+    
+    sx1255_write_reg(0x00, val);
+}
+
+void sx1255_enable_tx_frontend(bool enable)
+{
+    uint8_t val = sx1255_read_reg(0x00);
+    
+    if (enable)
+    {
+        val |= (uint8_t)(1 << 2);
+    }
+    else
+    {
+        val &= (uint8_t)~(1 << 2);
+    }
+    
+    sx1255_write_reg(0x00, val);
+}
+
 void sx1255_enable_rx(bool enable)
 {
     uint8_t val = sx1255_read_reg(0x00);

@@ -47,6 +47,8 @@ void sx1255_set_tx_pll_bw(uint16_t bw_khz);
 
 // Path enable/disable
 void sx1255_enable_tx(bool enable);
+void sx1255_enable_tx_pa(bool enable);
+void sx1255_enable_tx_frontend(bool enable);
 void sx1255_enable_rx(bool enable);
 void sx1255_enable_rf_loopback(bool enable);
 
