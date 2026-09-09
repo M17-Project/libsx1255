@@ -6,7 +6,7 @@
 
 // Configuration constants
 #ifndef SX1255_CLK_FREQ
-#define SX1255_CLK_FREQ (32.0e6f)
+#define SX1255_CLK_FREQ 32000000ULL
 #endif
 
 // SX1255 sample rate options
