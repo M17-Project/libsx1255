@@ -9,6 +9,8 @@
 #define SX1255_CLK_FREQ 32000000ULL
 #endif
 
+#define SX1255_MAX_SEQ_RW 16 // how many registers can be written to / read from in a sequence
+
 // SX1255 sample rate options
 typedef enum
 {
@@ -25,8 +27,10 @@ void sx1255_cleanup(void);
 int sx1255_reset(void);
 
 // Low-level register access
-void sx1255_write_reg(uint8_t addr, uint8_t val);
+int sx1255_write_reg(uint8_t addr, uint8_t val);
+int sx1255_write_reg_seq(uint8_t start_addr, const uint8_t* inp_seq, uint8_t seq_len);
 uint8_t sx1255_read_reg(uint8_t addr);
+int sx1255_read_reg_seq(uint8_t start_addr, uint8_t* out_seq, uint8_t seq_len);
 
 // Frequency control
 void sx1255_set_rx_freq(uint32_t freq);

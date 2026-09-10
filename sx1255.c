@@ -86,12 +86,12 @@ static int spi_init(const char *dev)
     return 0;
 }
 
-void sx1255_write_reg(uint8_t addr, uint8_t val)
+int sx1255_write_reg(uint8_t addr, uint8_t val)
 {
     if (fd < 0)
     {
         perror("sx1255_write_reg: open");
-        return;
+        return -1;
     }
     uint8_t tx[2] = {addr | (1 << 7), val};
     struct spi_ioc_transfer tr = {
@@ -99,10 +99,48 @@ void sx1255_write_reg(uint8_t addr, uint8_t val)
         .rx_buf = 0,
         .len = 2,
     };
-    ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+
+    if (ioctl(fd, SPI_IOC_MESSAGE(1), &tr) < 0)
+    {
+        perror("sx1255_write_reg: ioctl");
+        return -1;
+    }
+
     usleep(10000U);
+    return 0;
 }
 
+int sx1255_write_reg_seq(uint8_t start_addr, const uint8_t* inp_seq, uint8_t seq_len)
+{
+    if (seq_len > SX1255_MAX_SEQ_RW)
+    {
+        fprintf(stderr, "sx1255_write_reg_seq: sequence too long (%u > %u)\n", seq_len, SX1255_MAX_SEQ_RW);
+        return -1;
+    }
+    if (fd < 0)
+    {
+        perror("sx1255_write_reg_seq: open");
+        return -1;
+    }
+    uint8_t tx[1 + SX1255_MAX_SEQ_RW] = {start_addr | (1 << 7)};
+    memcpy(&tx[1], inp_seq, seq_len);
+    struct spi_ioc_transfer tr = {
+        .tx_buf = (unsigned long)tx,
+        .rx_buf = 0,
+        .len = 1 + seq_len,
+    };
+
+    if (ioctl(fd, SPI_IOC_MESSAGE(1), &tr) < 0)
+    {
+        perror("sx1255_write_reg_seq: ioctl");
+        return -1;
+    }
+
+    usleep(10000U);
+    return 0;
+}
+
+//TODO: pass the pointer to the output as an argument, leave the result for success/error signalling
 uint8_t sx1255_read_reg(uint8_t addr)
 {
     if (fd < 0)
@@ -117,9 +155,46 @@ uint8_t sx1255_read_reg(uint8_t addr)
         .rx_buf = (unsigned long)rx,
         .len = 2,
     };
-    ioctl(fd, SPI_IOC_MESSAGE(1), &tr);
+
+    if (ioctl(fd, SPI_IOC_MESSAGE(1), &tr) < 0)
+    {
+        perror("sx1255_read_reg: ioctl");
+        return 0;
+    }
+
     usleep(10000U);
     return rx[1];
+}
+
+int sx1255_read_reg_seq(uint8_t start_addr, uint8_t* out_seq, uint8_t seq_len)
+{
+    if (seq_len > SX1255_MAX_SEQ_RW)
+    {
+        fprintf(stderr, "sx1255_read_reg_seq: sequence too long (%u > %u)\n", seq_len, SX1255_MAX_SEQ_RW);
+        return -1;
+    }
+    if (fd < 0)
+    {
+        perror("sx1255_read_reg_seq: open");
+        return -1;
+    }
+    uint8_t tx[1 + SX1255_MAX_SEQ_RW] = {start_addr & ~(1 << 7)};
+    uint8_t rx[1 + SX1255_MAX_SEQ_RW] = {0};
+    struct spi_ioc_transfer tr = {
+        .tx_buf = (unsigned long)tx,
+        .rx_buf = (unsigned long)rx,
+        .len = 1 + seq_len,
+    };
+
+    if (ioctl(fd, SPI_IOC_MESSAGE(1), &tr) < 0)
+    {
+        perror("sx1255_read_reg_seq: ioctl");
+        return -1;
+    }
+
+    usleep(10000U);
+    memcpy(out_seq, &rx[1], seq_len);
+    return 0;
 }
 
 static uint32_t sx1255_freq_to_reg(uint32_t freq)
