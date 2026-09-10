@@ -33,8 +33,8 @@ uint8_t sx1255_read_reg(uint8_t addr);
 int sx1255_read_reg_seq(uint8_t start_addr, uint8_t* out_seq, uint8_t seq_len);
 
 // Frequency control
-void sx1255_set_rx_freq(uint32_t freq);
-void sx1255_set_tx_freq(uint32_t freq);
+int sx1255_set_rx_freq(uint32_t freq);
+int sx1255_set_tx_freq(uint32_t freq);
 
 // Sample rate configuration
 int8_t sx1255_set_rate(sx1255_rate_t rate);

@@ -202,20 +202,18 @@ static uint32_t sx1255_freq_to_reg(uint32_t freq)
     return (uint32_t)(((uint64_t)freq * 1048576ULL + SX1255_CLK_FREQ / 2) / SX1255_CLK_FREQ); // 1048576 = 2^20
 }
 
-void sx1255_set_rx_freq(uint32_t freq)
+int sx1255_set_rx_freq(uint32_t freq)
 {
     uint32_t val = sx1255_freq_to_reg(freq);
-    sx1255_write_reg(0x01, (val >> 16) & 0xFF);
-    sx1255_write_reg(0x02, (val >> 8) & 0xFF);
-    sx1255_write_reg(0x03, val & 0xFF);
+    uint8_t seq[3] = {(val >> 16) & 0xFF, (val >> 8) & 0xFF, val & 0xFF};
+    return sx1255_write_reg_seq(0x01, seq, 3);
 }
 
-void sx1255_set_tx_freq(uint32_t freq)
+int sx1255_set_tx_freq(uint32_t freq)
 {
     uint32_t val = sx1255_freq_to_reg(freq);
-    sx1255_write_reg(0x04, (val >> 16) & 0xFF);
-    sx1255_write_reg(0x05, (val >> 8) & 0xFF);
-    sx1255_write_reg(0x06, val & 0xFF);
+    uint8_t seq[3] = {(val >> 16) & 0xFF, (val >> 8) & 0xFF, val & 0xFF};
+    return sx1255_write_reg_seq(0x04, seq, 3);
 }
 
 int8_t sx1255_set_rate(sx1255_rate_t rate)
